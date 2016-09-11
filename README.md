@@ -2,7 +2,7 @@
 
 This mod provides three libraries that make defining LuaGuiElement style prototypes much, much easier.
 
-> See the wiki for [full documentation](https://github.com/aubergine10/Style/wiki).
+> :orange_book: See the wiki for [full documentation](https://github.com/aubergine10/Style/wiki).
 
 ## Comparison
 
