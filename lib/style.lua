@@ -203,7 +203,7 @@ function style.parse_flow( flow )
   flow.spacing  = parse( flow.spacing  ) -- x, y
   -- build and return style
   return {
-    type = 'flow_style';
+    type   = 'flow_style';
     parent = flow.extends or ( flow.extends ~= false and 'flow_style' );
     -- flow
     visible              = flow.visible;
@@ -254,7 +254,7 @@ function style.frame( name )
     title.padding  = parse( title.padding  ) -- top, right, bottom, left
     -- build and register style
     define[name] = {
-      type = 'frame_style';
+      type   = 'frame_style';
       parent = frame.extends or ( frame.extends ~= false and 'frame_style' );
       -- frame
       visible                = frame.visible;
@@ -286,6 +286,43 @@ function style.frame( name )
 end
 
 
+-- scrollpane stylesheet
+function style.scrollpane( name )
+  if not name or type(name) ~= 'string' then
+    error 'style.scrollpane: must specify a name'
+  end
+  return function( settings )
+    local pane = settings or {}
+    local scrollbar = pane.scrollbar or {}
+    style.parse_common( pane )
+    local scrollbar.spacing = parse( scrollbar.spacing ) -- x, y
+    -- build and register style
+    define[name] = {
+      type   = 'scroll_pane_style';
+      parent = pane.extends or ( pane.extends ~= false and 'scroll_pane_style' );
+      -- scroll pane
+      visible        = pane.visible;
+      width          = pane.size    [w];
+      height         = pane.size    [h];
+      minimal_width  = pane.minSize [w];
+      minimal_height = pane.minSize [h];
+      maximal_width  = pane.maxSize [w];
+      maximal_height = pane.maxSize [h];
+      top_padding    = pane.padding [top   ];
+      right_padding  = pane.padding [right ];
+      bottom_padding = pane.padding [bottom];
+      left_padding   = pane.padding [left  ];
+      -- scrollbars
+      horizontal_scroll_bar_spacing = scrollbar.spacing [x];
+      vertical_scroll_bar_spacing   = scrollbar.spacing [y];
+      -- flow
+      flow_style = style.parse_flow( settings.flow )
+    }
+    return define[name]
+  end
+end
+
+
 -- button stylesheet
 function style.button( name )
   if not name or type(name) ~= 'string' then
@@ -301,7 +338,7 @@ function style.button( name )
     style.parse_common( button )
     -- build and register style
     define[name] = {
-      type = 'button_style';
+      type   = 'button_style';
       parent = button.extends or ( button.extends ~= false and 'button_style' );
       -- button
       visible                = button.visible;
@@ -347,11 +384,11 @@ function style.label( name )
     error 'style.label: must specify a name'
   end
   return function( settings )
-    local label   = settings or {}
+    local label = settings or {}
     style.parse_common( label )
     -- build and register style
     define[name] = {
-      type = 'label_style';
+      type   = 'label_style';
       parent = label.extends or ( label.extends ~= false and 'label_style' );
       -- label
       visible                = label.visible;
@@ -376,8 +413,6 @@ end
 
 
 -- publish globals
-_G.style = style
-_G.image = image
-_G.sound = sound
+_G.style, _G.image, _G.sound = style, image, sound
 
 return { style = style, image = image, sound = sound }
