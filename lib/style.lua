@@ -25,7 +25,9 @@ Docs: https://github.com/aubergine10/Style/wiki
 -- luacheck: globals data color
 
 -- quick bail if already initialised
-if _G.style then return _G.style, _G.image, _G.sound end
+if _G.style then
+  return { style = _G.style, image = _G.image, sound = _G.sound }
+end
 
 -- get handle to where the gui styles are defined
 local define = data.raw['gui-style'].default
@@ -84,6 +86,8 @@ function style.parse( values, default )
   end
 end
 
+local parse = style.parse
+
 -- determine path to file
 -- likely to change in future, internal use only
 function style.addPathTo( filename )
@@ -105,8 +109,8 @@ function image.composite( filename )
   return function( settings )
     -- finalize settings
     settings     = settings or {}
-    local pos    = style.parse( settings.pos   , 0 )
-    local corner = style.parse( settings.corner, 1 )
+    local pos    = parse( settings.pos   , 0 )
+    local corner = parse( settings.corner, 1 )
     -- build composite
     return {
       type         = 'composition';
@@ -128,7 +132,6 @@ function image.monolith( filename )
   return function( settings )
     -- finalize settings
     settings    = settings or {}
-    local parse = style.parse
     local pos   = parse( settings.pos, 0) -- x, y
     local size  = parse( settings.size  ) -- w, h
     local border= parse( settings.border) -- top, right, bottom, left
@@ -183,6 +186,60 @@ do--sandbox
 end--sandbox
 
 
+-- internal: parse common attributes used by most styles
+function style.parse_common( settings )
+  settings.size     = parse( settings.size     ) -- w, h
+  settings.minSize  = parse( settings.minSize  ) -- w, h
+  settings.maxSize  = parse( settings.maxSize  ) -- w, h
+  settings.padding  = parse( settings.padding  ) -- top, right, bottom, left
+end
+
+
+-- intenral: used by flow, frame, scrollpane
+function style.parse_flow( flow )
+  if not flow then return end
+  style.parse_common( flow )
+  flow.autoSize = parse( flow.autoSize ) -- w, h (booleans)
+  flow.spacing  = parse( flow.spacing  ) -- x, y
+  -- build and return style
+  return {
+    type = 'flow_style';
+    parent = flow.extends or ( flow.extends ~= false and 'flow_style' );
+    -- flow
+    visible              = flow.visible;
+    width                = flow.size    [w];
+    height               = flow.size    [h];
+    minimal_width        = flow.minSize [w];
+    minimal_height       = flow.minSize [h];
+    maximal_width        = flow.maxSize [w];
+    maximal_height       = flow.maxSize [h];
+    resize_row_to_width  = flow.autoSize[w];
+    resize_to_row_height = flow.autoSize[h];
+    top_padding          = flow.padding [top   ];
+    right_padding        = flow.padding [right ];
+    bottom_padding       = flow.padding [bottom];
+    left_padding         = flow.padding [left  ];
+    horizontal_spacing   = flow.spacing [x];
+    vertical_spacing     = flow.spacing [y];
+    max_on_row           = flow.maxOnRow; -- no idea what this does
+  }
+end
+
+
+-- flow stylesheet
+function style.flow( name )
+  if not name or type(name) ~= 'string' then
+    error 'style.flow: must specify a name'
+  end
+  return function( settings )
+    local flow = settings or {}
+    -- build and register style
+    define[name] = style.parse_flow( flow )
+    return define[name]
+  end
+end
+
+
 -- frame stylesheet
 function style.frame( name )
   if not name or type(name) ~= 'string' then
@@ -190,21 +247,11 @@ function style.frame( name )
   end
   return function( settings )
     settings = settings or {}
-    local parse = style.parse
-    local frame   , title               , flow
-        = settings, settings.title or {}, settings.flow or {}
-    frame.padding = parse( frame.padding ) -- top, right, bottom, left
-    frame.size    = parse( frame.size    ) -- w, h
-    frame.minSize = parse( frame.minSize ) -- w, h
-    frame.maxSize = parse( frame.maxSize ) -- w, h
-    frame.autoSize= parse( frame.autoSize) -- w, h (booleans)
-    title.padding = parse( title.padding ) -- top, right, bottom, left
-    flow.padding  = parse( flow.padding  ) -- top, right, bottom, left
-    flow.spacing  = parse( flow.spacing  ) -- x, y
-    flow.size     = parse( flow.size     ) -- w, h
-    flow.minSize  = parse( flow.minSize  ) -- w, h
-    flow.maxSize  = parse( flow.maxSize  ) -- w, h
-    flow.autoSize = parse( flow.autoSize ) -- w, h (booleans)
+    local frame   , title
+        = settings, settings.title or {}
+    style.parse_common( frame )
+    frame.autoSize = parse( frame.autoSize ) -- w, h (booleans)
+    title.padding  = parse( title.padding  ) -- top, right, bottom, left
     -- build and register style
     define[name] = {
       type = 'frame_style';
@@ -232,65 +279,8 @@ function style.frame( name )
       title_bottom_padding   = title.padding [bottom];
       title_left_padding     = title.padding [left  ];
       -- flow
-      flow_style = {
-        max_on_row           = flow.maxOnRow; -- no idea what this does
-        horizontal_spacing   = flow.spacing  [x];
-        vertical_spacing     = flow.spacing  [y];
-        width                = flow.size     [w];
-        height               = flow.size     [h];
-        minimal_width        = flow.minSize  [w];
-        minimal_height       = flow.minSize  [h];
-        maximal_width        = flow.maxSize  [w];
-        maximal_height       = flow.maxSize  [h];
-        resize_row_to_width  = flow.autoSize [w];
-        resize_to_row_height = flow.autoSize [h];
-        top_padding          = flow.padding  [top   ];
-        right_padding        = flow.padding  [right ];
-        bottom_padding       = flow.padding  [bottom];
-        left_padding         = flow.padding  [left  ];
-      }--flow
+      flow_style = style.parse_flow( settings.flow )
     }--define
-    return define[name]
-  end
-end
-
-
--- flow stylesheet
-function style.flow( name )
-  if not name or type(name) ~= 'string' then
-    error 'style.flow: must specify a name'
-  end
-  return function( settings )
-    local flow = settings or {}
-    local parse = style.parse
-    flow.size     = parse( flow.size     ) -- w, h
-    flow.minSize  = parse( flow.minSize  ) -- w, h
-    flow.maxSize  = parse( flow.maxSize  ) -- w, h
-    flow.autoSize = parse( flow.autoSize ) -- w, h (booleans)
-    flow.padding  = parse( flow.padding  ) -- top, right, bottom, left
-    flow.spacing  = parse( flow.spacing  ) -- x, y
-    -- build and register style
-    define[name] = {
-      type = 'flow_style';
-      parent = flow.extends or ( flow.extends ~= false and 'flow_style' );
-      -- flow
-      visible              = flow.visible;
-      width                = flow.size    [w];
-      height               = flow.size    [h];
-      minimal_width        = flow.minSize [w];
-      minimal_height       = flow.minSize [h];
-      maximal_width        = flow.maxSize [w];
-      maximal_height       = flow.maxSize [h];
-      resize_row_to_width  = flow.autoSize[w];
-      resize_to_row_height = flow.autoSize[h];
-      top_padding          = flow.padding [top   ];
-      right_padding        = flow.padding [right ];
-      bottom_padding       = flow.padding [bottom];
-      left_padding         = flow.padding [left  ];
-      horizontal_spacing   = flow.spacing  [x];
-      vertical_spacing     = flow.spacing  [y];
-      max_on_row           = flow.maxOnRow; -- no idea what this does
-    }
     return define[name]
   end
 end
@@ -308,10 +298,7 @@ function style.button( name )
     local clicked  = button.clicked  or {}
     local disabled = button.disabled or {}
     local line     = button.line     or {}
-    button.padding = style.parse( button.padding ) -- top, right, bottom, left
-    button.size    = style.parse( button.size    ) -- w, h
-    button.minSize = style.parse( button.minSize ) -- w, h
-    button.maxSize = style.parse( button.maxSize ) -- w, h
+    style.parse_common( button )
     -- build and register style
     define[name] = {
       type = 'button_style';
@@ -361,10 +348,7 @@ function style.label( name )
   end
   return function( settings )
     local label   = settings or {}
-    label.padding = style.parse( label.padding ) -- top, right, bottom, left
-    label.size    = style.parse( label.size    ) -- w, h
-    label.minSize = style.parse( label.minSize ) -- w, h
-    label.maxSize = style.parse( label.maxSize ) -- w, h
+    style.parse_common( label )
     -- build and register style
     define[name] = {
       type = 'label_style';
@@ -377,7 +361,6 @@ function style.label( name )
       minimal_height         = label.minSize [h];
       maximal_width          = label.maxSize [w];
       maximal_height         = label.maxSize [h];
-      -- not sure if padding props supported, but leaving them in for now:
       top_padding            = label.padding [top   ];
       right_padding          = label.padding [right ];
       bottom_padding         = label.padding [bottom];
