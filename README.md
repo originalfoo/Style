@@ -6,7 +6,7 @@ This mod provides three libraries that make defining LuaGuiElement style prototy
 
 ## Comparison
 
-Using the API, you can do this:
+Using the API, you can do stuff like this:
 
 ```lua
 style.path = '__MyMod__/graphics'
