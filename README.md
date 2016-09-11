@@ -20,7 +20,7 @@ style.frame 'example_frame' {
 }
 ```
 
-Without the API, the above code would look like this:
+Without the API, the above code would look like this (which is actually what the above code does internally):
 
 ```lua
 data.raw['gui-style'].default['example-frame'] = {
