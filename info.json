@@ -1,0 +1,12 @@
+{
+  "name": "Style",
+  "version": "0.0.1",
+  "title": "[Library] Style v0.0.1 (experimental)",
+  "author": "aubergine18",
+  "contact": "https://github.com/aubergine10/Style/issues",
+  "homepage": "https://github.com/aubergine10/Style",
+  "description": "API for modders that makes defining LuaGuiElement style prototypes much, much nicer.",
+  "dependencies": ["base >= 0.14.0"],
+  "factorio_version": "0.14",
+  "licelse": "MIT"
+}
