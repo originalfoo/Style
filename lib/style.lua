@@ -292,6 +292,51 @@ function style.button( name )
 end
 
 
+-- checkbox stylesheet
+function style.checkbox( name )
+  if not name or type(name) ~= 'string' then
+    error 'style.checkbox: must specify a name'
+  end
+  return function( settings )
+    local checkbox   = settings        or {}
+    local default  = checkbox.default  or {}
+    local hover    = checkbox.hover    or {}
+    local clicked  = checkbox.clicked  or {}
+    local selected = checkbox.selected or {}
+    style.parse_common( checkbox )
+    -- build and register style
+    define[name] = {
+      type   = 'checkbox_style';
+      parent = checkbox.extends or ( checkbox.extends ~= false and 'checkbox_style' );
+      -- checkbox
+      visible                = checkbox.visible;
+      top_padding            = checkbox.padding [top   ];
+      right_padding          = checkbox.padding [right ];
+      bottom_padding         = checkbox.padding [bottom];
+      left_padding           = checkbox.padding [left  ];
+      width                  = checkbox.size    [w];
+      height                 = checkbox.size    [h];
+      minimal_width          = checkbox.minSize [w];
+      minimal_height         = checkbox.minSize [h];
+      maximal_width          = checkbox.maxSize [w];
+      maximal_height         = checkbox.maxSize [h];
+      -- checkbox states
+      default_background     = default.background;
+      hovered_background     = hover.background;
+      clicked_background     = clicked.background;
+      checked                = selected.background;
+      -- caption
+      align                  = checkbox.align;
+      font_color             = checkbox.color;
+      font                   = checkbox.font;
+      -- sounds
+      left_click_sound       = checkbox.sound;
+    }
+    return define[name]
+  end
+end
+
+
 -- label stylesheet
 function style.label( name )
   if not name or type(name) ~= 'string' then
