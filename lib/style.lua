@@ -295,7 +295,7 @@ function style.scrollpane( name )
     local pane = settings or {}
     local scrollbar = pane.scrollbar or {}
     style.parse_common( pane )
-    local scrollbar.spacing = parse( scrollbar.spacing ) -- x, y
+    scrollbar.spacing = parse( scrollbar.spacing ) -- x, y
     -- build and register style
     define[name] = {
       type   = 'scroll_pane_style';
