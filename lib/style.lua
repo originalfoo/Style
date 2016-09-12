@@ -18,19 +18,21 @@ By: Aubergine18 (git:aubergine10) | License: MIT
 
 Source: https://github.com/aubergine10/Style
 
-Docs: https://github.com/aubergine10/Style/wiki
+Docs: https://github.com/aubergine10/Style/wiki/style-API
 
 --]]
 
--- luacheck: globals data color
+-- luacheck: globals data
 
 -- quick bail if already initialised
 if _G.style then
   return { style = _G.style, image = _G.image, sound = _G.sound }
 end
 
+
 -- get handle to where the gui styles are defined
 local define = data.raw['gui-style'].default
+
 
 -- retrieve an existing stylesheet
 -- local sheet = style('sheet-name')
@@ -58,12 +60,11 @@ local style = setmetatable( {}, {
   end
 } )
 
-local image, sound
-    = {}   , {}
 
 -- indexes for parsed arrays (see style.parse)
 local x, y, w, h, top, right, bottom, left
     = 1, 2, 1, 2, 1  , 2    , 3     , 4
+
 
 -- parse "padding"-like arrays
 -- likely to change in future, internal use only
@@ -88,102 +89,15 @@ end
 
 local parse = style.parse
 
--- determine path to file
--- likely to change in future, internal use only
+-- DEPRECATED - DO NOT USE!!
 function style.addPathTo( filename )
   if filename:find( '__', 1, true ) == 1 then
     return filename
   else
-    return (_G.style.path or '') .. filename
+    local prefix = _G.style.path or ''
+    return prefix .. filename
   end
 end
-
--- no image
-image.none = { type = 'none' }
-
--- composite image
-function image.composite( filename )
-  if not filename or type(filename) ~= 'string' then
-    error 'image.composite: must specify filename'
-  end
-  return function( settings )
-    -- finalize settings
-    settings     = settings or {}
-    local pos    = parse( settings.pos   , 0 )
-    local corner = parse( settings.corner, 1 )
-    -- build composite
-    return {
-      type         = 'composition';
-      filename     = style.addPathTo( filename );
-      position     = { pos   [x], pos   [y] };
-      corner_size  = { corner[w], corner[h] };
-      scale        = settings.scale;
-      opacity      = settings.opacity; -- 0..1
-      priority     = 'extra-high-no-scale';
-    }
-  end
-end
-
--- monolith image
-function image.monolith( filename )
-  if not filename or type(filename) ~= 'string' then
-    error 'image.monolith: must specify filename'
-  end
-  return function( settings )
-    -- finalize settings
-    settings    = settings or {}
-    local pos   = parse( settings.pos, 0) -- x, y
-    local size  = parse( settings.size  ) -- w, h
-    local border= parse( settings.border) -- top, right, bottom, left
-    -- build composite
-    return {
-      type = 'monolith';
-      -- border props don't seem to do anything
-      top_monolith_border    = border [top   ];
-      right_monolith_border  = border [right ];
-      bottom_monolith_border = border [bottom];
-      left_monolith_border   = border [left  ];
-      monolith_image = {
-        filename     = style.addPathTo( filename );
-        x            = pos  [x];
-        y            = pos  [y];
-        width        = size [w];
-        height       = size [h];
-        scale        = settings.scale; -- doesn't seem to work
-        opacity      = settings.opacity; -- 0..1
-        priority     = 'extra-high-no-scale';
-      };
-      -- stretch image to fill parent?
-      stretch_monolith_image_to_size = settings.autoSize;
-    }
-  end
-end
-
-do--sandbox
-  local validType = { string = true, table = true }
-
-  -- click sound(s) for buttons
-  -- specify multiple filenames in array for random sound each click
-  function sound.effect( filenames, volume, preload )
-    if not filenames or not validType[type( filenames )] then
-      error 'sound.effect: must specify filename(s)'
-    end
-    volume  = volume or 1
-    preload = preload or true
-    if type( filenames ) == 'string' then filenames = { filenames } end
-    -- build sound array
-    local sounds = {}
-    for i, filename in ipairs( filenames ) do
-      sounds[i] = {
-        filename = style.addPathTo( filename );
-        volume   = volume;
-        preload  = preload;
-      }
-    end--for
-    return sounds
-  end--function style.sound
-
-end--sandbox
 
 
 -- internal: parse common attributes used by most styles
@@ -413,6 +327,5 @@ end
 
 
 -- publish globals
-_G.style, _G.image, _G.sound = style, image, sound
-
-return { style = style, image = image, sound = sound }
+_G.style = style
+return style
