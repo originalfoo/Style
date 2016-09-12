@@ -22,7 +22,6 @@ Docs: https://github.com/aubergine10/Style/wiki/sound-API
 if _G.sound then return _G.sound end
 
 local sound = {}
-local validType = { string = true, table = true }
 
 -- determine path to sound file
 -- deprecated style.path used as fallback until 1.0 release
@@ -36,25 +35,26 @@ function sound.addPathTo( filename )
 end
 
 -- click sound(s) for buttons
--- specify multiple filenames in array for random sound each click
-function sound.effect( filenames, volume, preload )
-  if not filenames or not validType[type( filenames )] then
-    error 'sound.effect: must specify filename(s)'
+function sound.effect( filename, volume, preload )
+  if not filename or type( filename ) ~= 'string' then
+    error 'sound.effect: must specify filename'
   end
   volume  = volume or 1
   preload = preload or true
-  if type( filenames ) == 'string' then filenames = { filenames } end
-  -- build sound array
-  local sounds = {}
-  for i, filename in ipairs( filenames ) do
-    sounds[i] = {
-      filename = sound.addPathTo( filename );
-      volume   = volume;
-      preload  = preload;
-    }
-  end--for
-  return sounds
-end--function sound.effect
+  return {{
+    filename = sound.addPathTo( filename );
+    volume   = volume;
+    preload  = preload;
+  }}
+end
+
+-- game will choose sound at random
+function sound.random( ... )
+  local randomiser = {}
+  local sounds = table.pack( ... )
+  for i, effect in sounds do randomiser[i] = effect[1] end
+  return randomiser
+end
 
 _G.sound = sound
 return sound
