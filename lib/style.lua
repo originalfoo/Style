@@ -400,8 +400,8 @@ function style.textfield( name )
       align          = textfield.align; -- not tested, only works if width set?
       font           = textfield.font;
       font_color     = textfield.color;
-      -- the background color of selected text
-      selection_background_color = textfield.selectedColor;
+      -- the background color of highlighted (selected) text
+      selection_background_color = textfield.highlight;
     }
     return define[name]
   end
