@@ -9,7 +9,7 @@ This mod provides three libraries that make defining LuaGuiElement style prototy
 Using the API, you can do stuff like this:
 
 ```lua
-style.path = '__MyMod__/graphics'
+image.path = '__MyMod__/graphics'
 
 style.frame 'example_frame' {
   padding    = {0,6,3,0};
