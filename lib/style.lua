@@ -371,6 +371,43 @@ function style.label( name )
 end
 
 
+-- textfield stylesheet
+function style.textfield( name )
+  if not name or type(name) ~= 'string' then
+    error 'style.textfield: must specify a name'
+  end
+  return function( settings )
+    local textfield = settings or {}
+    style.parse_common( textfield )
+    -- build and register style
+    define[name] = {
+      type   = 'textfield_style';
+      parent = textfield.extends or ( textfield.extends ~= false and 'textfield_style' );
+      -- textfield
+      visible        = textfield.visible;
+      width          = textfield.size    [w];
+      height         = textfield.size    [h];
+      minimal_width  = textfield.minSize [w];
+      minimal_height = textfield.minSize [h];
+      maximal_width  = textfield.maxSize [w];
+      maximal_height = textfield.maxSize [h];
+      top_padding    = textfield.padding [top   ];
+      right_padding  = textfield.padding [right ];
+      bottom_padding = textfield.padding [bottom];
+      left_padding   = textfield.padding [left  ];
+      graphical_set  = textfield.background;
+      -- caption
+      align          = textfield.align; -- not tested, only works if width set?
+      font           = textfield.font;
+      font_color     = textfield.color;
+      -- the background color of selected text
+      selection_background_color = textfield.selectedColor;
+    }
+    return define[name]
+  end
+end
+
+
 -- publish globals
 _G.style = style
 return style
