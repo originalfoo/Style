@@ -6,7 +6,7 @@
 /\__/ / (_) | |_| | | | | (_| | | | | | |    _| |_
 \____/ \___/ \__,_|_| |_|\__,_| \_| |_|_|   |____/
 
-Simple API for creating sound prototype tables.
+Simple API for creating sound descriptor tables.
 
 By: Aubergine18 (git:aubergine10) | License: MIT
 

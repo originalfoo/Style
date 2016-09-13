@@ -9,8 +9,8 @@
            |___/
 
 A simplified DSL for defining LuaGuiElement
-stylesheet prototypes; much more concise
-than the cumbersome vanilla format.
+`*_style` prototypes in a much more concise
+manner than the cumbersome vanilla format.
 
 style[type] 'name' { settings } --> prototype
 
@@ -298,7 +298,7 @@ function style.checkbox( name )
     error 'style.checkbox: must specify a name'
   end
   return function( settings )
-    local checkbox   = settings        or {}
+    local checkbox = settings          or {}
     local default  = checkbox.default  or {}
     local hover    = checkbox.hover    or {}
     local clicked  = checkbox.clicked  or {}
@@ -309,28 +309,28 @@ function style.checkbox( name )
       type   = 'checkbox_style';
       parent = checkbox.extends or ( checkbox.extends ~= false and 'checkbox_style' );
       -- checkbox
-      visible                = checkbox.visible;
-      top_padding            = checkbox.padding [top   ];
-      right_padding          = checkbox.padding [right ];
-      bottom_padding         = checkbox.padding [bottom];
-      left_padding           = checkbox.padding [left  ];
-      width                  = checkbox.size    [w];
-      height                 = checkbox.size    [h];
-      minimal_width          = checkbox.minSize [w];
-      minimal_height         = checkbox.minSize [h];
-      maximal_width          = checkbox.maxSize [w];
-      maximal_height         = checkbox.maxSize [h];
+      visible            = checkbox.visible;
+      top_padding        = checkbox.padding [top   ];
+      right_padding      = checkbox.padding [right ];
+      bottom_padding     = checkbox.padding [bottom];
+      left_padding       = checkbox.padding [left  ];
+      width              = checkbox.size    [w];
+      height             = checkbox.size    [h];
+      minimal_width      = checkbox.minSize [w];
+      minimal_height     = checkbox.minSize [h];
+      maximal_width      = checkbox.maxSize [w];
+      maximal_height     = checkbox.maxSize [h];
       -- checkbox states
-      default_background     = default.background;
-      hovered_background     = hover.background;
-      clicked_background     = clicked.background;
-      checked                = selected.background;
+      default_background = default.background;
+      hovered_background = hover.background;
+      clicked_background = clicked.background;
+      checked            = selected.background; -- overlays on top  of other states
       -- caption
-      align                  = checkbox.align;
-      font_color             = checkbox.color;
-      font                   = checkbox.font;
+      align              = checkbox.align;
+      font_color         = checkbox.color;
+      font               = checkbox.font;
       -- sounds
-      left_click_sound       = checkbox.sound;
+      left_click_sound   = checkbox.sound;
     }
     return define[name]
   end
@@ -350,21 +350,21 @@ function style.label( name )
       type   = 'label_style';
       parent = label.extends or ( label.extends ~= false and 'label_style' );
       -- label
-      visible                = label.visible;
-      width                  = label.size    [w];
-      height                 = label.size    [h];
-      minimal_width          = label.minSize [w];
-      minimal_height         = label.minSize [h];
-      maximal_width          = label.maxSize [w];
-      maximal_height         = label.maxSize [h];
-      top_padding            = label.padding [top   ];
-      right_padding          = label.padding [right ];
-      bottom_padding         = label.padding [bottom];
-      left_padding           = label.padding [left  ];
+      visible        = label.visible;
+      width          = label.size    [w];
+      height         = label.size    [h];
+      minimal_width  = label.minSize [w];
+      minimal_height = label.minSize [h];
+      maximal_width  = label.maxSize [w];
+      maximal_height = label.maxSize [h];
+      top_padding    = label.padding [top   ];
+      right_padding  = label.padding [right ];
+      bottom_padding = label.padding [bottom];
+      left_padding   = label.padding [left  ];
       -- caption
-      align                  = label.align; -- not tested, only works if width set?
-      font                   = label.font;
-      font_color             = label.color;
+      align          = label.align; -- not tested, only works if width set?
+      font           = label.font;
+      font_color     = label.color;
     }
     return define[name]
   end

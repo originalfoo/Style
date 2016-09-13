@@ -8,7 +8,7 @@
                        __/ |
                       |___/
 
-Simple API for creating image prototype tables.
+Simple API for creating image descriptor tables.
 
 Requires style.lua's parse function
 
