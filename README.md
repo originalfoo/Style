@@ -18,9 +18,11 @@ style.frame 'example_frame' {
   title      = { padding = 0, color = color '#F00' };
   flow       = { padding = 0, spacing = 0, autoSize = true, maxOnRow = 0 };
 }
+
+-- the frame style will be converted to raw prototype format (see below)
 ```
 
-Without the API, the above code would look like this (which is actually what the above code does internally):
+The exact same thing, written in normal raw prototype format:
 
 ```lua
 data.raw['gui-style'].default['example-frame'] = {
