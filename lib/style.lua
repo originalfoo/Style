@@ -22,7 +22,7 @@ Docs: https://github.com/aubergine10/Style/wiki/style-API
 
 --]]
 
--- luacheck: globals data
+-- luacheck: globals data color
 
 local style = { api = true }
 
@@ -72,6 +72,30 @@ function style.parse_common( settings )
   settings.maxSize  = parse( settings.maxSize  ) -- w, h
   settings.padding  = parse( settings.padding  ) -- top, right, bottom, left
 end
+
+-- internal: parse color properties
+function style.parse_color( ... )
+  local typ = type( ... )
+  if typ == 'nil' then
+    return nil
+  elseif typ == 'string' then -- hex
+    return color( ... )
+  elseif typ == 'table' then
+    return ...
+  elseif typ == 'number' then
+    local vals = table.pack( ... )
+
+    -- convert indices to color properties
+      vals.r      , vals.g      , vals.b      , vals.a
+    = vals[1] or 0, vals[2] or 0, vals[3] or 0, vals[4] or 1
+
+    return vals
+  else
+    return nil
+  end
+end
+
+local parseColor = style.parse_color
 
 -- intenral: used by flow, frame, scrollpane
 function style.parse_flow( flow )
@@ -147,7 +171,7 @@ function style.frame( name )
       left_padding           = frame.padding [left  ];
       -- title
       font                   = title.font;
-      font_color             = title.color;
+      font_color             = parseColor( title.color );
       title_top_padding      = title.padding [top   ];
       title_right_padding    = title.padding [right ];
       title_bottom_padding   = title.padding [bottom];
@@ -225,21 +249,21 @@ function style.button( name )
       maximal_height         = button.maxSize [h];
       -- button states
       default_graphical_set  = default.background;
-      default_font_color     = default.color;
+      default_font_color     = parseColor( default.color );
       hovered_graphical_set  = hover.background;
-      hovered_font_color     = hover.color;
+      hovered_font_color     = parseColor( hover.color );
       clicked_graphical_set  = clicked.background;
-      clicked_font_color     = clicked.color;
+      clicked_font_color     = parseColor( clicked.color );
       disabled_graphical_set = disabled.background;
-      disabled_font_color    = disabled.color;
+      disabled_font_color    = parseColor( disabled.color );
       -- caption
       align                  = button.align;
       font                   = button.font;
       -- horizontal line (no idea if this works)
-      line_color             = line.color;
+      line_color             = parseColor( line.color );
       line_width             = line.width;
       -- pie chart
-      pie_progress_color     = button.pieColor;
+      pie_progress_color     = parseColor( button.pieColor );
       -- sounds
       left_click_sound       = button.sound;
     }
@@ -281,7 +305,7 @@ function style.checkbox( name )
       checked            = selected.background; -- overlays on top  of other states
       -- caption
       align              = checkbox.align;
-      font_color         = checkbox.color;
+      font_color         = parseColor( checkbox.color );
       font               = checkbox.font;
       -- sounds
       left_click_sound   = checkbox.sound;
@@ -316,7 +340,7 @@ function style.label( name )
       -- caption
       align          = label.align; -- not tested, only works if width set?
       font           = label.font;
-      font_color     = label.color;
+      font_color     = parseColor( label.color );
     }
     return define[name]
   end
@@ -349,7 +373,7 @@ function style.textfield( name )
       -- caption
       align          = textfield.align; -- not tested, only works if width set?
       font           = textfield.font;
-      font_color     = textfield.color;
+      font_color     = parseColor( textfield.color );
       -- the background color of highlighted (selected) text
       selection_background_color = textfield.highlight;
     }
@@ -387,8 +411,8 @@ function style.table( name )
       vertical_spacing      = table.spacing [y];
       cell_padding          = table.cellPadding;
       -- row
-      hovered_row_color     = row.hovered;
-      selected_row_color    = row.selected;
+      hovered_row_color     = parseColor( row.hovered );
+      selected_row_color    = parseColor( row.selected );
       odd_row_graphical_set = row.background;
       -- column
       column_graphical_set  = col.background;
