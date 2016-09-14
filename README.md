@@ -20,8 +20,6 @@ style.frame 'example_frame' {
   title      = { padding = 0, color = color '#F00' };
   flow       = { padding = 0, spacing = 0, autoSize = true, maxOnRow = 0 };
 }
-
--- the frame style will be converted to raw prototype format (see below)
 ```
 
 The exact same thing, written without the API (raw prototype format used in vanilla Factorio styles):
