@@ -8,7 +8,7 @@ The goal is to drastically reduce verbosity of style definitions (and associated
 
 ## Comparison
 
-Here's an example frame style sheet, using the Style API:
+Using the style API to define a frame style...
 
 ```lua
 image.path = '__MyMod__/graphics'
@@ -22,7 +22,7 @@ style.frame 'example_frame' {
 }
 ```
 
-The exact same thing, written without the API (raw prototype format used in vanilla Factorio styles):
+The exact same frame style, without using the api...
 
 ```lua
 data.raw['gui-style'].default['example-frame'] = {
