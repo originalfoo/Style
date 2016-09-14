@@ -4,7 +4,7 @@ This mod provides several APIs that make defining LuaGuiElement style prototypes
 
 > The library motto is: _"Concise is nice! Semantic is fantastic!"_
 
-The goal is to drastically reduce verbosity of style definitions (and associated things like images, sound, keyboard shortcuts, etc), with a strong focus on making stlesheets much easier to reason about via a consistent, semantic syntax.
+The goal is to drastically reduce verbosity of style definitions (and associated things like images, sound, keyboard shortcuts, etc), with a strong focus on making them much easier to reason about due to a consistent, semantic syntax.
 
 ## Comparison
 
