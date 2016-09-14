@@ -2,7 +2,7 @@
 
 This mod provides several APIs that make defining LuaGuiElement style prototypes much, much easier.
 
-> The library motto is: _"Concise is nice! Semantic is fantastic!"_
+> The library motto is: _"Concise is nice, Semantic is fantastic!"_
 
 The goal is to drastically reduce verbosity of style definitions (and associated things like images, sound, keyboard shortcuts, etc), whilst making them easier to reason about and maintain by using a consistent, semantic syntax.
 
