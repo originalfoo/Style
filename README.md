@@ -19,7 +19,7 @@ style.frame 'example_frame' {
   padding    = {0,6,3,0};
   autoSize   = true;
   background = image.composite 'toolbar.png' { corner = 3 };
-  title      = { padding = 0, color = color '#F00' };
+  title      = { padding = 0, color = '#F00' };
   flow       = { padding = 0, spacing = 0, autoSize = true, maxOnRow = 0 };
 }
 ```
@@ -38,7 +38,7 @@ data.raw['gui-style'].default['example-frame'] = {
   title_right_padding = 0,
   title_bottom_padding = 0,
   title_left_padding = 0,
-  font_color = color '#F00',
+  font_color = { r = 1, g = 0, b = 0, a = 1 },
   graphical_set = {
     type = 'composition',
     filename = '__MyMod__/graphics/toolbar.png',
