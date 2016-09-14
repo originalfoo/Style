@@ -2,6 +2,10 @@
 
 This mod provides three libraries that make defining LuaGuiElement style prototypes much, much easier.
 
+The library motto is: "Concise is nice! Semantic is fantastic!"
+
+The goal is to drastically reduce verbosity of style definitions (and associated things like images, sound, keyboard shortcuts, etc), with a strong focus on making stlesheets much easier to reason about via a consistent, semantic syntax.
+
 > :orange_book: See the wiki for [full documentation](https://github.com/aubergine10/Style/wiki).
 
 ## Comparison
