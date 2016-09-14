@@ -1,16 +1,14 @@
 # Style
 
-This mod provides three libraries that make defining LuaGuiElement style prototypes much, much easier.
+This mod provides several APIs that make defining LuaGuiElement style prototypes much, much easier. To use it in your project, simply add the mod as a dependency in your `info.json`. See the wiki for [full documentation](https://github.com/aubergine10/Style/wiki).
 
 > The library motto is: _"Concise is nice! Semantic is fantastic!"_
 
 The goal is to drastically reduce verbosity of style definitions (and associated things like images, sound, keyboard shortcuts, etc), with a strong focus on making stlesheets much easier to reason about via a consistent, semantic syntax.
 
-> See the wiki for [full documentation](https://github.com/aubergine10/Style/wiki).
-
 ## Comparison
 
-Using the API, you can do stuff like this:
+Here's an example frame style sheet, using the Style API:
 
 ```lua
 image.path = '__MyMod__/graphics'
@@ -26,7 +24,7 @@ style.frame 'example_frame' {
 -- the frame style will be converted to raw prototype format (see below)
 ```
 
-The exact same thing, written in normal raw prototype format:
+The exact same thing, written without the API (raw prototype format used in vanilla Factorio styles):
 
 ```lua
 data.raw['gui-style'].default['example-frame'] = {
