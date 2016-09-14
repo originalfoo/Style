@@ -22,10 +22,7 @@ Docs: https://github.com/aubergine10/Style/wiki/image-API
 
 -- luacheck: globals data color
 
--- quick bail if already initialised
-if _G.image then return _G.image end
-
-local image = {}
+local image = { api = true }
 
 -- indexes for parsed arrays (see style.parse)
 local x, y, w, h, top, right, bottom, left
@@ -50,9 +47,9 @@ image.none = { type = 'none' }
 -- a raw image which can be used in various prototypes
 -- (not just LuaGuiElement styles)
 function image.raw( filename, apiMethod )
-  if not filename or type(filename) ~= 'string' then
+  if type(filename) ~= 'string' then
     apiMethod = apiMethod or 'image.raw'
-    error( apiMethod .. ': must specify filename' )
+    error( apiMethod .. ': invalid filename' )
   end
   return function( settings )
     -- finalize settings
@@ -97,8 +94,8 @@ end
 
 -- composite image
 function image.composite( filename )
-  if not filename or type(filename) ~= 'string' then
-    error 'image.composite: must specify filename'
+  if type(filename) ~= 'string' then
+    error 'image.composite: invalid filename'
   end
   return function( settings )
     -- finalize settings
@@ -119,4 +116,4 @@ function image.composite( filename )
 end
 
 _G.image = image
-return image
+return _G.image

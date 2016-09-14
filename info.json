@@ -1,12 +1,12 @@
 {
   "name": "Style",
-  "version": "0.0.5",
-  "title": "Style v0.0.5 [Library Mod] (beta)",
+  "version": "0.0.6",
+  "title": "Style v0.0.6 [Library Mod] (beta)",
   "author": "aubergine18",
   "contact": "https://github.com/aubergine10/Style/issues",
   "homepage": "https://github.com/aubergine10/Style",
   "description": "API for modders that makes defining LuaGuiElement style prototypes quicker, easier and nicer.\n\nNow in beta phase, API is almost complete.",
-  "dependencies": ["base >= 0.14.0"],
+  "dependencies": ["base >= 0.14"],
   "factorio_version": "0.14",
   "licelse": "MIT"
 }

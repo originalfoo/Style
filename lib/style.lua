@@ -24,50 +24,16 @@ Docs: https://github.com/aubergine10/Style/wiki/style-API
 
 -- luacheck: globals data
 
--- quick bail if already initialised
-if _G.style then
-  return { style = _G.style, image = _G.image, sound = _G.sound }
-end
-
+local style = { api = true }
 
 -- get handle to where the gui styles are defined
 local define = data.raw['gui-style'].default
-
-
--- retrieve an existing stylesheet
--- local sheet = style('sheet-name')
-local style = setmetatable( {}, {
-  __call = function( _, name, convert )
-    if not name then -- return container
-      return define
-    elseif type(name) == 'table' then -- define new style
-      local proto = name[2]
-      name = name[1]
-      if not name or not proto then
-        error 'style: invalid syle definition'
-      end
-      if define[name] then
-        error('style: prototype "'..name..'" already defined')
-      end
-      define[name] = proto
-      return proto
-    elseif convert then -- convert proto befor returning
-      local proto = define[name]
-      return proto and convert(proto, name) or nil, name
-    else -- return raw proto
-      return define[name], name
-    end
-  end
-} )
-
 
 -- indexes for parsed arrays (see style.parse)
 local x, y, w, h, top, right, bottom, left
     = 1, 2, 1, 2, 1  , 2    , 3     , 4
 
-
--- parse "padding"-like arrays
--- likely to change in future, internal use only
+-- internal: parse "padding"-like arrays
 function style.parse( values, default )
   if values == nil then
     return { default, default, default, default }
@@ -99,7 +65,6 @@ function style.addPathTo( filename )
   end
 end
 
-
 -- internal: parse common attributes used by most styles
 function style.parse_common( settings )
   settings.size     = parse( settings.size     ) -- w, h
@@ -107,7 +72,6 @@ function style.parse_common( settings )
   settings.maxSize  = parse( settings.maxSize  ) -- w, h
   settings.padding  = parse( settings.padding  ) -- top, right, bottom, left
 end
-
 
 -- intenral: used by flow, frame, scrollpane
 function style.parse_flow( flow )
@@ -139,11 +103,9 @@ function style.parse_flow( flow )
   }
 end
 
-
--- flow stylesheet
 function style.flow( name )
-  if not name or type(name) ~= 'string' then
-    error 'style.flow: must specify a name'
+  if type(name) ~= 'string' then
+    error 'style.flow: invalid stylesheet name'
   end
   return function( settings )
     local flow = settings or {}
@@ -153,11 +115,9 @@ function style.flow( name )
   end
 end
 
-
--- frame stylesheet
 function style.frame( name )
-  if not name or type(name) ~= 'string' then
-    error 'style.frame: must specify a name'
+  if type(name) ~= 'string' then
+    error 'style.frame: invalid stylesheet name'
   end
   return function( settings )
     settings = settings or {}
@@ -199,11 +159,9 @@ function style.frame( name )
   end
 end
 
-
--- scrollpane stylesheet
 function style.scrollpane( name )
-  if not name or type(name) ~= 'string' then
-    error 'style.scrollpane: must specify a name'
+  if type(name) ~= 'string' then
+    error 'style.scrollpane: invalid stylesheet name'
   end
   return function( settings )
     local pane = settings or {}
@@ -236,11 +194,9 @@ function style.scrollpane( name )
   end
 end
 
-
--- button stylesheet
 function style.button( name )
-  if not name or type(name) ~= 'string' then
-    error 'style.button: must specify a name'
+  if type(name) ~= 'string' then
+    error 'style.button: invalid stylesheet name'
   end
   return function( settings )
     local button   = settings        or {}
@@ -291,11 +247,9 @@ function style.button( name )
   end
 end
 
-
--- checkbox stylesheet
 function style.checkbox( name )
-  if not name or type(name) ~= 'string' then
-    error 'style.checkbox: must specify a name'
+  if type(name) ~= 'string' then
+    error 'style.checkbox: invalid stylesheet name'
   end
   return function( settings )
     local checkbox = settings          or {}
@@ -336,11 +290,9 @@ function style.checkbox( name )
   end
 end
 
-
--- label stylesheet
 function style.label( name )
-  if not name or type(name) ~= 'string' then
-    error 'style.label: must specify a name'
+  if type(name) ~= 'string' then
+    error 'style.label: invalid stylesheet name'
   end
   return function( settings )
     local label = settings or {}
@@ -370,11 +322,9 @@ function style.label( name )
   end
 end
 
-
--- textfield stylesheet
 function style.textfield( name )
-  if not name or type(name) ~= 'string' then
-    error 'style.textfield: must specify a name'
+  if type(name) ~= 'string' then
+    error 'style.textfield: invalid stylesheet name'
   end
   return function( settings )
     local textfield = settings or {}
@@ -407,7 +357,82 @@ function style.textfield( name )
   end
 end
 
+function style.table( name )
+  if type(name) ~= 'string' then
+    error 'style.table: invalid stylesheet name'
+  end
+  return function( settings )
+    local table = settings  or {}
+    local row   = table.row or {}
+    local col   = table.col or {}
+    style.parse_common( table )
+    table.spacing = parse( table.spacing ) -- x, y
+    -- build and register style
+    define[name] = {
+      type   = 'table_style';
+      parent = table.extends or ( table.extends ~= false and 'table_style' );
+      -- table
+      visible               = table.visible;
+      width                 = table.size    [w];
+      height                = table.size    [h];
+      minimal_width         = table.minSize [w];
+      minimal_height        = table.minSize [h];
+      maximal_width         = table.maxSize [w];
+      maximal_height        = table.maxSize [h];
+      top_padding           = table.padding [top   ];
+      right_padding         = table.padding [right ];
+      bottom_padding        = table.padding [bottom];
+      left_padding          = table.padding [left  ];
+      horizontal_spacing    = table.spacing [x];
+      vertical_spacing      = table.spacing [y];
+      cell_padding          = table.cellPadding;
+      -- row
+      hovered_row_color     = row.hovered;
+      selected_row_color    = row.selected;
+      odd_row_graphical_set = row.background;
+      -- column
+      column_graphical_set  = col.background;
+      column_ordering_ascending_indicator  = col.ascending;
+      column_ordering_descending_indicator = col.descending;
+    }
+    return define[name]
+  end
+end
 
--- publish globals
-_G.style = style
-return style
+-- style()
+_G.style = setmetatable( style, {
+
+  __call = function( _, name, convert )
+
+    if not name then -- return container
+      return define
+
+    elseif type(name) == 'table' then -- define new style
+      local proto = name[2]
+      name = name[1]
+
+      if not name or not proto then
+        error 'style: invalid syle definition'
+      end
+
+      if define[name] then
+        error('style: prototype "'..name..'" already defined')
+      end
+
+      define[name] = proto
+      return proto
+
+    elseif convert then -- convert proto befor returning
+      local proto = define[name]
+      return proto and convert(proto, name) or nil, name
+
+    else -- return raw proto
+      return define[name], name
+
+    end
+
+  end--function __call
+
+} )
+
+return _G.style

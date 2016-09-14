@@ -16,34 +16,65 @@ Docs: https://github.com/aubergine10/Style/wiki/shortcut-API
 
 --]]
 
--- luacheck: globals data
+-- luacheck: globals data log
 
--- quick bail if already initialised
-if _G.shortcut then return _G.shortcut end
+local shortcut = { api = true, used = {} }
 
-local shortcut = setmetatable( {}, {
-  __call = function( self, keys )
-    if not keys or type(keys) ~= 'string' then
-      error 'shortcut: must specify shortcut keys'
+-- internal: log newly added/discovered shortcut.
+-- asterisk at end of log entry means shortcut was
+-- defined using the shortcut api
+function shortcut:log( keys, event, consume, api )
+  log(
+    'Shortcut "'..keys..'" '..
+    'triggers "'..event..'" '..
+    '('..(consume or 'none')..')'..api
+  )
+  self.used[keys] = true
+end
+
+-- are keys already used?
+function shortcut:defined( keys )
+  return self.used[keys]
+end
+
+-- internal:
+-- find any keys that were defined without this api
+-- and add them to our list of used keys
+function shortcut:refresh()
+  local shortcuts = data.raw['custom-input']
+  if not shortcuts then return end
+
+  for _,input in pairs(shortcuts) do
+
+    local keys = input.key_sequence:upper()
+
+    if not self:defined(keys) then
+      self:log( keys, input.name, input.consuming, '' )
     end
-    keys = keys:upper()
-    return function( settings )
-      if not settings or type(settings) ~= 'table' or not settings.event then
-        error 'shortcut: must specify event name'
-      end
-      local proto = {
-        type = 'custom-input';
-        name = settings.event;
-        key_sequence = keys;
-        consuming    = self.consume[settings.scope or settings.consume] or 'none';
-      }
-      data:extend{ proto }
-      return proto
+
+  end--for
+end
+
+-- internal:
+-- choose earliest unused key from selection,
+-- or if none available use first selection
+function shortcut:chooseFrom( selection )
+  -- refresh list of used keys
+  self:refresh()
+  -- choose first unused if possible
+  local keys
+  for i = 1, #selection do
+    local choice = selection[i]:upper()
+    if not self:defined(choice) then
+      keys = choice
+      break
     end
   end
-})
+  -- revert to first item if necessary
+  return keys or selection[1]
+end
 
--- internal dictionary to map scope to consuming
+-- internal: dictionary to map scope to consuming
 shortcut.consume = {
   -- vanilla
   ['none'       ] = 'none';
@@ -60,5 +91,48 @@ shortcut.consume = {
   ['self + mods'] = 'game-only';
 }
 
-_G.shortcut = shortcut
-return shortcut
+local valid = { string = true, table = true }
+
+-- shortcut() method
+-- used to define keyboard shortcuts
+_G.shortcut = setmetatable( shortcut, {
+
+  __call = function( self, keys )
+
+    if not valid[type(keys)] then
+      error 'shortcut: invalid shortcut keys'
+    end
+
+    if type(keys) == 'table' then
+      keys = self:chooseFrom( keys )
+    else
+      keys = keys:upper()
+    end
+
+    return function( settings )
+
+      if type(settings) ~= 'table' or not settings.event then
+        error 'shortcut: invalid settings table or event name'
+      end
+
+      local proto = {
+        type = 'custom-input';
+        name = settings.event;
+        key_sequence = keys;
+        consuming = self.consume[
+          settings.scope or settings.consume or 'none'
+        ];
+      }
+
+      data:extend { proto }
+
+      self:log( keys, settings.event, proto.consuming, '*' )
+      return proto
+
+    end--function settings
+
+  end
+
+})
+
+return _G.shortcut

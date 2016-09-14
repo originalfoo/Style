@@ -18,10 +18,7 @@ Docs: https://github.com/aubergine10/Style/wiki/sound-API
 
 -- luacheck: globals color
 
--- quick bail if already initialised
-if _G.sound then return _G.sound end
-
-local sound = {}
+local sound = { api = true }
 
 -- determine path to sound file
 -- deprecated style.path used as fallback until 1.0 release
@@ -36,8 +33,8 @@ end
 
 -- click sound(s) for buttons
 function sound.effect( filename, volume, preload )
-  if not filename or type( filename ) ~= 'string' then
-    error 'sound.effect: must specify filename'
+  if type( filename ) ~= 'string' then
+    error 'sound.effect: invalid filename'
   end
   volume  = volume or 1
   preload = preload or true
@@ -51,10 +48,12 @@ end
 -- game will choose sound at random
 function sound.random( ... )
   local randomiser = {}
-  local sounds = table.pack( ... )
+  local sounds = type(...) == 'table' and select(1,...) or table.pack(...)
+
   for i, effect in sounds do randomiser[i] = effect[1] end
+
   return randomiser
 end
 
 _G.sound = sound
-return sound
+return _G.sound
