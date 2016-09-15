@@ -29,12 +29,12 @@ local style = { api = true }
 -- get handle to where the gui styles are defined
 local define = data.raw['gui-style'].default
 
--- indexes for parsed arrays (see style.parse)
+-- indexes for parsed arrays (see style.expamd)
 local x, y, w, h, top, right, bottom, left
     = 1, 2, 1, 2, 1  , 2    , 3     , 4
 
 -- internal: parse "padding"-like arrays
-function style.parse( values, default )
+function style.expamd( values, default )
   if values == nil then
     return { default, default, default, default }
   elseif type( values ) ~= 'table' then
@@ -49,11 +49,11 @@ function style.parse( values, default )
   elseif #values == 4 then
     return values
   else
-    error 'style.parse: specify none, 1, 2 or 4 values'
+    error 'style.expamd: specify none, 1, 2 or 4 values'
   end
 end
 
-local parse = style.parse
+local expand = style.expamd
 
 -- DEPRECATED - DO NOT USE!!
 function style.addPathTo( filename )
@@ -67,10 +67,10 @@ end
 
 -- internal: parse common attributes used by most styles
 function style.parse_common( settings )
-  settings.size     = parse( settings.size     ) -- w, h
-  settings.minSize  = parse( settings.minSize  ) -- w, h
-  settings.maxSize  = parse( settings.maxSize  ) -- w, h
-  settings.padding  = parse( settings.padding  ) -- top, right, bottom, left
+  settings.size     = expand( settings.size     ) -- w, h
+  settings.minSize  = expand( settings.minSize  ) -- w, h
+  settings.maxSize  = expand( settings.maxSize  ) -- w, h
+  settings.padding  = expand( settings.padding  ) -- top, right, bottom, left
 end
 
 -- internal: parse color properties
@@ -101,8 +101,8 @@ local parseColor = style.parse_color
 function style.parse_flow( flow )
   if not flow then return end
   style.parse_common( flow )
-  flow.autoSize = parse( flow.autoSize ) -- w, h (booleans)
-  flow.spacing  = parse( flow.spacing  ) -- x, y
+  flow.autoSize = expand( flow.autoSize ) -- w, h (booleans)
+  flow.spacing  = expand( flow.spacing  ) -- x, y
   -- build and return style
   return {
     type   = 'flow_style';
@@ -148,8 +148,8 @@ function style.frame( name )
     local frame   , title
         = settings, settings.title or {}
     style.parse_common( frame )
-    frame.autoSize = parse( frame.autoSize ) -- w, h (booleans)
-    title.padding  = parse( title.padding  ) -- top, right, bottom, left
+    frame.autoSize = expand( frame.autoSize ) -- w, h (booleans)
+    title.padding  = expand( title.padding  ) -- top, right, bottom, left
     -- build and register style
     define[name] = {
       type   = 'frame_style';
@@ -191,7 +191,7 @@ function style.scrollpane( name )
     local pane = settings or {}
     local scrollbar = pane.scrollbar or {}
     style.parse_common( pane )
-    scrollbar.spacing = parse( scrollbar.spacing ) -- x, y
+    scrollbar.spacing = expand( scrollbar.spacing ) -- x, y
     -- build and register style
     define[name] = {
       type   = 'scroll_pane_style';
@@ -390,7 +390,7 @@ function style.table( name )
     local row   = table.row or {}
     local col   = table.col or {}
     style.parse_common( table )
-    table.spacing = parse( table.spacing ) -- x, y
+    table.spacing = expand( table.spacing ) -- x, y
     -- build and register style
     define[name] = {
       type   = 'table_style';

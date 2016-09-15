@@ -10,7 +10,7 @@
 
 Simple API for creating image descriptor tables.
 
-Requires style.lua's parse function
+Requires style.lua's expand function
 
 By: Aubergine18 (git:aubergine10) | License: MIT
 
@@ -24,11 +24,11 @@ Docs: https://github.com/aubergine10/Style/wiki/image-API
 
 local image = { api = true }
 
--- indexes for parsed arrays (see style.parse)
+-- indexes for parsed arrays (see style.expnd)
 local x, y, w, h, top, right, bottom, left
     = 1, 2, 1, 2, 1  , 2    , 3     , 4
 
-local parse = _G.style.parse
+local expand = _G.style.expand
 
 -- determine path to image file
 -- deprecated style.path used as fallback until 1.0 release
@@ -54,8 +54,8 @@ function image.raw( filename, apiMethod )
   return function( settings )
     -- finalize settings
     settings    = settings or {}
-    local pos   = parse( settings.pos, 0 ) -- x, y
-    local size  = parse( settings.size   ) -- w, h
+    local pos   = expand( settings.pos, 0 ) -- x, y
+    local size  = expand( settings.size   ) -- w, h
     -- build prototype
     return {
       filename     = image.addPathTo( filename );
@@ -75,7 +75,7 @@ function image.monolith( filename )
   return function( settings )
     local rawImage
     rawImage, settings = image.raw( filename, 'image.monolith' )( settings )
-    local border = parse( settings.border ) -- top, right, bottom, left
+    local border = expand( settings.border ) -- top, right, bottom, left
     -- build prototype
     return {
       type = 'monolith';
@@ -100,8 +100,8 @@ function image.composite( filename )
   return function( settings )
     -- finalize settings
     settings     = settings or {}
-    local pos    = parse( settings.pos   , 0 )
-    local corner = parse( settings.corner, 1 )
+    local pos    = expand( settings.pos   , 0 )
+    local corner = expand( settings.corner, 1 )
     -- build prototype
     return {
       type         = 'composition';
