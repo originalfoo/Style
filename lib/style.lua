@@ -277,46 +277,63 @@ function style.button( name )
   end
 end
 
+-- internal: build either radiobutton or checkbox
+function style.build_toggle_element( name, settings, type )
+  local element  = settings         or {}
+  local default  = element.default  or {}
+  local hover    = element.hover    or {}
+  local clicked  = element.clicked  or {}
+  local selected = element.selected or {}
+  style.parse_common( element )
+  -- build and register style
+  define[name] = {
+    type   = type;
+    parent = element.extends or ( element.extends ~= false and type );
+    -- element
+    visible            = element.visible;
+    top_padding        = element.padding [top   ];
+    right_padding      = element.padding [right ];
+    bottom_padding     = element.padding [bottom];
+    left_padding       = element.padding [left  ];
+    width              = element.size    [w];
+    height             = element.size    [h];
+    minimal_width      = element.minSize [w];
+    minimal_height     = element.minSize [h];
+    maximal_width      = element.maxSize [w];
+    maximal_height     = element.maxSize [h];
+    -- element states
+    default_background = default.background;
+    hovered_background = hover.background;
+    clicked_background = clicked.background;
+    -- checkbox:
+    checked            = selected.background; -- overlays on top  of other states
+    -- radiobutton:
+    selected           = selected.background; -- overlays on top  of other states
+    -- caption
+    align              = element.align;
+    font_color         = parseColor( element.color );
+    font               = element.font;
+    -- sounds
+    left_click_sound   = element.sound;
+  }
+  return define[name]
+end
+
+function style.radiobutton( name )
+  if type(name) ~= 'string' then
+    error 'style.radiobutton: invalid stylesheet name'
+  end
+  return function( settings )
+    return style.build_toggle_element( name, settings, 'radiobutton_style' )
+  end
+end
+
 function style.checkbox( name )
   if type(name) ~= 'string' then
     error 'style.checkbox: invalid stylesheet name'
   end
   return function( settings )
-    local checkbox = settings          or {}
-    local default  = checkbox.default  or {}
-    local hover    = checkbox.hover    or {}
-    local clicked  = checkbox.clicked  or {}
-    local selected = checkbox.selected or {}
-    style.parse_common( checkbox )
-    -- build and register style
-    define[name] = {
-      type   = 'checkbox_style';
-      parent = checkbox.extends or ( checkbox.extends ~= false and 'checkbox_style' );
-      -- checkbox
-      visible            = checkbox.visible;
-      top_padding        = checkbox.padding [top   ];
-      right_padding      = checkbox.padding [right ];
-      bottom_padding     = checkbox.padding [bottom];
-      left_padding       = checkbox.padding [left  ];
-      width              = checkbox.size    [w];
-      height             = checkbox.size    [h];
-      minimal_width      = checkbox.minSize [w];
-      minimal_height     = checkbox.minSize [h];
-      maximal_width      = checkbox.maxSize [w];
-      maximal_height     = checkbox.maxSize [h];
-      -- checkbox states
-      default_background = default.background;
-      hovered_background = hover.background;
-      clicked_background = clicked.background;
-      checked            = selected.background; -- overlays on top  of other states
-      -- caption
-      align              = checkbox.align;
-      font_color         = parseColor( checkbox.color );
-      font               = checkbox.font;
-      -- sounds
-      left_click_sound   = checkbox.sound;
-    }
-    return define[name]
+    return style.build_toggle_element( name, settings, 'checkbox_style' )
   end
 end
 
