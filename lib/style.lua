@@ -22,7 +22,7 @@ Docs: https://github.com/aubergine10/Style/wiki/style-API
 
 --]]
 
--- luacheck: globals data color
+-- luacheck: globals data color log
 
 local style = { api = true }
 
@@ -54,6 +54,12 @@ function style.expamd( values, default )
 end
 
 local expand = style.expamd
+
+-- DEPRECATED - DO NOT USE!!
+function style.parse( ... )
+  log 'style.parse is deprecated, use style.expand instead'
+  return style.expand( ... )
+end
 
 -- DEPRECATED - DO NOT USE!!
 function style.addPathTo( filename )
