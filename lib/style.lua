@@ -459,6 +459,29 @@ function style.table( name )
   end
 end
 
+-- style.font
+
+style.font = setmetatable( {}, {
+  __call = function( self, name )
+    if type( name ) ~= 'string' then
+      error 'style.font: invalid font name'
+    end
+    return function( settings )
+      if type( settings.localeKey ) ~= 'string' then
+        error( 'style.font: invalid localeKey for font "'..name..'"' )
+      end
+      local font = {
+        type = 'font'             ;
+        name = name               ;
+        size = settings.size or 12;
+        from = settings.localeKey ;
+      }
+      data:extend{ font }
+      return self
+    end
+  end
+} )
+
 -- style()
 _G.style = setmetatable( style, {
 
