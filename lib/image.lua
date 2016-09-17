@@ -28,7 +28,7 @@ local image = { api = true }
 local x, y, w, h, top, right, bottom, left
     = 1, 2, 1, 2, 1  , 2    , 3     , 4
 
-local expand         , parse_color
+local expand         , parseColor
     = _G.style.expand, _G.style.parse_color
 
 local defPri  , guiPri
@@ -58,7 +58,7 @@ function image.raw( filename, apiMethod )
     local _    = settings or {}
     _.pos      = expand( _.pos, 0 ) -- x, y
     _.size     = expand( _.size   ) -- w, h
-    _.tint     = parse_color( _.tint )
+    _.tint     = parseColor( _.tint )
     _.priority = _.priority or guiPri
 
     return {
@@ -111,7 +111,7 @@ function image.composite( filename )
     local _  = settings or {}
     _.pos    = expand( _.pos   , 0 )
     _.corner = expand( _.corner, 1 )
-    _.tint   = parse_color( _.tint )
+    _.tint   = parseColor( _.tint )
 
     return {
       type        = 'composition'                ;
@@ -139,7 +139,7 @@ function image.animation( filename )
     _.pos   = expand( _.pos  , 0 ) -- x, y
     _.shift = expand( _.shift, 0 ) -- x, y
     _.size  = expand( _.size     ) -- w, h
-    _.tint  = parse_color( _.tint )
+    _.tint  = parseColor( _.tint )
 
     return {
       filename        = image.addPathTo( filename );
