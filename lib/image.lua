@@ -28,7 +28,11 @@ local image = { api = true }
 local x, y, w, h, top, right, bottom, left
     = 1, 2, 1, 2, 1  , 2    , 3     , 4
 
-local expand = _G.style.expand
+local expand         , parse_color
+    = _G.style.expand, _G.style.parse_color
+
+local defPri  , guiPri
+    = 'medium', 'extra-high-no-scale'
 
 -- determine path to image file
 -- deprecated style.path used as fallback until 1.0 release
@@ -48,46 +52,52 @@ image.none = { type = 'none' }
 -- (not just LuaGuiElement styles)
 function image.raw( filename, apiMethod )
   if type(filename) ~= 'string' then
-    apiMethod = apiMethod or 'image.raw'
-    error( apiMethod .. ': invalid filename' )
+    error( (apiMethod or 'image.raw') .. ': invalid filename' )
   end
   return function( settings )
-    -- finalize settings
-    settings    = settings or {}
-    local pos   = expand( settings.pos, 0 ) -- x, y
-    local size  = expand( settings.size   ) -- w, h
-    -- build prototype
+    local _    = settings or {}
+    _.pos      = expand( _.pos, 0 ) -- x, y
+    _.size     = expand( _.size   ) -- w, h
+    _.tint     = parse_color( _.tint )
+    _.priority = _.priority or guiPri
+
     return {
-      filename     = image.addPathTo( filename );
-      x            = pos  [x];
-      y            = pos  [y];
-      width        = size [w];
-      height       = size [h];
-      scale        = settings.scale; -- doesn't seem to work
-      opacity      = settings.opacity; -- 0..1
-      priority     = settings.priority or 'extra-high-no-scale';
-    }, settings
+      filename = image.addPathTo( filename );
+
+      opacity  = _.opacity  ;
+      x        = _.pos[x]   ;
+      y        = _.pos[y]   ;
+      priority = _.priority ;
+      scale    = _.scale    ;
+      width    = _.size[w]  ;
+      height   = _.size[h]  ;
+      tint     = _.tint     ;
+    }, _
   end
 end
 
 -- monolith image
+local stretch = 'stretch_monolith_image_to_size'
+
 function image.monolith( filename )
   return function( settings )
-    local rawImage
-    rawImage, settings = image.raw( filename, 'image.monolith' )( settings )
-    local border = expand( settings.border ) -- top, right, bottom, left
-    -- build prototype
+    local raw, _ = image.raw( filename, 'image.monolith' )( settings )
+
+    _.border = expand( settings.border ) -- top, right, bottom, left
+
+    if type( _.autoSize ) == 'table' then
+      _.autoSize = _.autoSize[1]
+    end
+
     return {
-      type = 'monolith';
-      -- border props don't seem to do anything
-      top_monolith_border    = border [top   ];
-      right_monolith_border  = border [right ];
-      bottom_monolith_border = border [bottom];
-      left_monolith_border   = border [left  ];
-      -- image
-      monolith_image = rawImage;
-      -- stretch image to fill parent?
-      stretch_monolith_image_to_size = settings.autoSize;
+      type                   = 'monolith'       ;
+      monolith_image         = raw              ;
+
+      [stretch]              = _.autoSize       ;
+      top_monolith_border    = _.border[top   ] ;
+      right_monolith_border  = _.border[right ] ;
+      bottom_monolith_border = _.border[bottom] ;
+      left_monolith_border   = _.border[left  ] ;
     }
   end
 end
@@ -98,19 +108,57 @@ function image.composite( filename )
     error 'image.composite: invalid filename'
   end
   return function( settings )
-    -- finalize settings
-    settings     = settings or {}
-    local pos    = expand( settings.pos   , 0 )
-    local corner = expand( settings.corner, 1 )
-    -- build prototype
+    local _  = settings or {}
+    _.pos    = expand( _.pos   , 0 )
+    _.corner = expand( _.corner, 1 )
+    _.tint   = parse_color( _.tint )
+
     return {
-      type         = 'composition';
-      filename     = image.addPathTo( filename );
-      position     = { pos   [x], pos   [y] };
-      corner_size  = { corner[w], corner[h] };
-      scale        = settings.scale;
-      opacity      = settings.opacity; -- 0..1
-      priority     = 'extra-high-no-scale';
+      type        = 'composition'                ;
+      filename    = image.addPathTo( filename )  ;
+
+      position    = { _.pos[x]   , _.pos[y]    } ;
+      corner_size = { _.corner[w], _.corner[h] } ;
+      scale       = _.scale                      ;
+      opacity     = _.opacity                    ;
+      priority    = _.priority or guiPri         ;
+      tint        = _.tint                       ;
+    }
+  end
+end
+
+-- animation image, used primarily for entities
+local axial = 'axially_symmetrical'
+
+function image.animation( filename )
+  if type(filename) ~= 'string' then
+    error 'image.animation: invalid filename'
+  end
+  return function( settings )
+    local _ = settings or {}
+    _.pos   = expand( _.pos  , 0 ) -- x, y
+    _.shift = expand( _.shift, 0 ) -- x, y
+    _.size  = expand( _.size     ) -- w, h
+    _.tint  = parse_color( _.tint )
+
+    return {
+      filename        = image.addPathTo( filename );
+
+      blend_mode      = _.blend              ;
+      line_length     = _.columns            ;
+      direction_count = _.directions or 1    ;
+      flags           = _.flags              ;
+      frame_count     = _.frames             ;
+      [axial]         = _.mirror             ;
+      x               = _.pos[x]             ;
+      y               = _.pos[y]             ;
+      priority        = _.priority or defPri ;
+      scale           = _.scale              ;
+      shift           = _.shift              ;
+      width           = _.size[w]            ;
+      height          = _.size[h]            ;
+      speed           = _.speed or 1         ;
+      tint            = _.tint               ;
     }
   end
 end
