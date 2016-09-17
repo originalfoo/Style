@@ -460,21 +460,23 @@ function style.table( name )
 end
 
 -- style.font
-
 style.font = setmetatable( {}, {
   __call = function( self, name )
     if type( name ) ~= 'string' then
       error 'style.font: invalid font name'
     end
     return function( settings )
+      settings.localeKey = settings.localeKey or self.localeKey
       if type( settings.localeKey ) ~= 'string' then
         error( 'style.font: invalid localeKey for font "'..name..'"' )
       end
+      self.localeKey = settings.localeKey
+
       local font = {
-        type = 'font'             ;
-        name = name               ;
-        size = settings.size or 12;
-        from = settings.localeKey ;
+        type = 'font'              ;
+        name = name                ;
+        size = settings.size or 14 ;
+        from = settings.localeKey  ;
       }
       data:extend{ font }
       return self
