@@ -64,13 +64,14 @@ function image.raw( filename, apiMethod )
     return {
       filename = image.addPathTo( filename );
 
-      opacity  = _.opacity  ;
       x        = _.pos[x]   ;
       y        = _.pos[y]   ;
-      priority = _.priority ;
-      scale    = _.scale    ;
-      width    = _.size[w]  ;
       height   = _.size[h]  ;
+      width    = _.size[w]  ;
+      shift    = _.shift    ;
+      priority = _.priority ;
+      opacity  = _.opacity  ;
+      scale    = _.scale    ;
       tint     = _.tint     ;
     }, _
   end
