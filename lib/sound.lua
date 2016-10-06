@@ -31,18 +31,28 @@ function sound.addPathTo( filename )
   end
 end
 
+-- allow set volume by %vol
+local volume_mt = {
+  __mod = function( self, volume )
+    for _,clip in pairs(self) do
+      clip.volume = volume
+    end
+    return self
+  end
+}
+
 -- click sound(s) for buttons
 function sound.effect( filename, volume, preload )
   if type( filename ) ~= 'string' then
-    error 'sound.effect: invalid filename'
+    error('sound.effect: invalid filename', 2)
   end
   volume  = volume or 1
   preload = preload or true
-  return {{
+  return setmetatable( {{
     filename = sound.addPathTo( filename );
     volume   = volume;
     preload  = preload;
-  }}
+  }}, volume_mt )
 end
 
 -- game will choose sound at random
@@ -50,9 +60,9 @@ function sound.random( ... )
   local randomiser = {}
   local sounds = type(...) == 'table' and select(1,...) or table.pack(...)
 
-  for i, effect in sounds do randomiser[i] = effect[1] end
+  for i, effect in ipairs(sounds) do randomiser[i] = effect[1] end
 
-  return randomiser
+  return setmetatable( randomiser, volume_mt )
 end
 
 _G.sound = sound
