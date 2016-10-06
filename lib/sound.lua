@@ -31,14 +31,38 @@ function sound.addPathTo( filename )
   end
 end
 
--- allow set volume by %vol
+-- adjust volume
 local volume_mt = {
-  __mod = function( self, volume )
+  __add = function( self, value )
+    for _,clip in pairs(self) do
+      clip.volume = clip.volume + value
+    end
+    return self
+  end;
+  __div = function( self, value )
+    for _,clip in pairs(self) do
+      clip.volume = clip.volume / value
+    end
+    return self
+  end;
+  __pow = function( self, volume )
     for _,clip in pairs(self) do
       clip.volume = volume
     end
     return self
-  end
+  end;
+  __mul = function( self, value )
+    for _,clip in pairs(self) do
+      clip.volume = clip.volume * value
+    end
+    return self
+  end;
+  __sub = function( self, value )
+    for _,clip in pairs(self) do
+      clip.volume = clip.volume - value
+    end
+    return self
+  end;
 }
 
 -- click sound(s) for buttons
