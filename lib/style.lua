@@ -477,6 +477,8 @@ style.font = setmetatable( {}, {
         name = name                ;
         size = settings.size or 14 ;
         from = settings.localeKey  ;
+        border = settings.border and true;
+        border_color = settings.border and parseColor( settings.borderColor )
       }
       data:extend{ font }
       return self
